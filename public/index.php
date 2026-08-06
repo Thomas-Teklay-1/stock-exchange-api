@@ -6,15 +6,13 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use App\Config\App;
 use App\Config\Database;
+use App\Helpers\JsonResponse;
 
 App::bootstrap();
 
 Database::getConnection();
 
-header('Content-Type: application/json');
-
-echo json_encode([
-    'success' => true,
-    'message' => 'Database connection established successfully.',
-    'environment' => $_ENV['APP_ENV'] ?? 'unknown'
-]);
+JsonResponse::success(
+    [],
+    'Stock Exchange API is running.'
+);
