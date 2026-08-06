@@ -37,16 +37,11 @@ class Database
 
             } catch (PDOException $exception) {
 
-                http_response_code(500);
-
-                header('Content-Type: application/json');
-
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Database connection failed.',
-                ]);
-
-                exit;
+                throw new PDOException(
+                    'Database connection failed: ' . $exception->getMessage(),
+                    (int) $exception->getCode(),
+                    $exception
+                );
             }
         }
 
