@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Helpers;
+namespace App\Http;
 
 class Request
 {
@@ -18,7 +18,37 @@ class Request
             PHP_URL_PATH
         );
 
-        return $uri ?: '/';
+        $uri = $uri ?: '/';
+
+        $basePath = self::basePath();
+
+        if (
+            $basePath !== '/' &&
+            str_starts_with($uri, $basePath)
+        ) {
+            $uri = substr($uri, strlen($basePath));
+        }
+
+        $uri = '/' . ltrim($uri, '/');
+
+        return $uri === '//' ? '/' : $uri;
+    }
+
+    private static function basePath(): string
+    {
+        if (!empty($_ENV['APP_BASE_PATH'])) {
+            return rtrim($_ENV['APP_BASE_PATH'], '/');
+        }
+
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+
+        $basePath = dirname($scriptName);
+
+        if ($basePath === '\\' || $basePath === '.') {
+            return '';
+        }
+
+        return rtrim(str_replace('\\', '/', $basePath), '/');
     }
 
     public static function input(): array

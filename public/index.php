@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-use App\Config\App;
-use App\Config\Database;
-use App\Helpers\JsonResponse;
+use App\Core\Application;
+use App\Routing\Router;
 
-App::bootstrap();
+Application::bootstrap();
 
-Database::getConnection();
+$router = new Router();
 
-JsonResponse::success(
-    [],
-    'Stock Exchange API is running.'
-);
+require dirname(__DIR__) . '/routes/api.php';
+
+$router->dispatch();

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Config;
+namespace App\Core;
 
 use Dotenv\Dotenv;
 
-class App
+class Application
 {
     public static function bootstrap(): void
     {
