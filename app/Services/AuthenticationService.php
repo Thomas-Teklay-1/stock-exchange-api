@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\UserRepositoryInterface;
+use App\Contracts\SessionRepositoryInterface;
 use App\Models\User;
 use InvalidArgumentException;
 use RuntimeException;
@@ -12,7 +13,8 @@ use RuntimeException;
 class AuthenticationService
 {
     public function __construct(
-        private UserRepositoryInterface $users
+        private UserRepositoryInterface $users, 
+        private SessionRepositoryInterface $sessions
     ) {
     }
 
@@ -91,7 +93,7 @@ class AuthenticationService
     public function authenticate(
         string $email,
         string $password
-    ): User {
+    ): array {
         $email = strtolower(trim($email));
 
         $user = $this->users->findByEmail($email);
@@ -111,7 +113,29 @@ class AuthenticationService
             );
         }
 
-        return $this->toUserModel($user);
+        $token = bin2hex(random_bytes(32));
+
+        $expiresAt = date(
+            'Y-m-d H:i:s',
+            time() + (60 * 60 * 24 * 7)
+        );
+
+        $this->sessions->create(
+            userId: (int) $user['user_id'],
+            token: $token,
+            expiresAt: $expiresAt
+        );
+
+        return [
+            'user' => $this->toUserModel($user),
+            'token' => $token,
+            'expires_at' => $expiresAt
+        ];
+    }
+
+    public function logout(string $token): bool
+    {
+        return $this->sessions->deleteByToken($token);
     }
 
     private function toUserModel(array $data): User
@@ -126,5 +150,35 @@ class AuthenticationService
             createdAt: $data['created_at'] ?? null,
             updatedAt: $data['updated_at'] ?? null
         );
+    }
+
+    public function getUserBySessionToken(
+        string $token
+    ): ?User {
+        $session = $this->sessions->findByToken($token);
+
+        if ($session === null) {
+            return null;
+        }
+
+        if (strtotime($session['expires_at']) <= time()) {
+            $this->sessions->deleteByToken($token);
+
+            return null;
+        }
+
+        $this->sessions->updateLastUsed(
+            (int) $session['session_id']
+        );
+
+        $user = $this->users->findById(
+            (int) $session['user_id']
+        );
+
+        if ($user === null) {
+            return null;
+        }
+
+        return $this->toUserModel($user);
     }
 }
