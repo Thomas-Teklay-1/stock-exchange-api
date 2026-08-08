@@ -11,6 +11,8 @@ Application::bootstrap();
 
 $router = new Router();
 
-require dirname(__DIR__) . '/routes/api.php';
+$apiRoutes = require dirname(__DIR__) . '/routes/api.php';
+
+$apiRoutes($router);
 
 $router->dispatch();

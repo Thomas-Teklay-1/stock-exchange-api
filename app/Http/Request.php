@@ -11,6 +11,43 @@ class Request
         return $_SERVER['REQUEST_METHOD'] ?? 'GET';
     }
 
+    public static function header(string $name): ?string
+    {
+        $serverKey = 'HTTP_' . strtoupper(
+            str_replace('-', '_', $name)
+        );
+
+        if (isset($_SERVER[$serverKey])) {
+            return trim($_SERVER[$serverKey]);
+        }
+
+        /*
+         * Apache may expose the Authorization header through
+         * REDIRECT_HTTP_AUTHORIZATION when using rewrite rules.
+         */
+        $redirectedServerKey = 'REDIRECT_' . $serverKey;
+
+        if (isset($_SERVER[$redirectedServerKey])) {
+            return trim($_SERVER[$redirectedServerKey]);
+        }
+
+        /*
+         * Some Apache configurations expose Authorization through
+         * getallheaders().
+         */
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+
+            foreach ($headers as $headerName => $value) {
+                if (strcasecmp($headerName, $name) === 0) {
+                    return trim($value);
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static function uri(): string
     {
         $uri = parse_url(
@@ -48,7 +85,10 @@ class Request
             return '';
         }
 
-        return rtrim(str_replace('\\', '/', $basePath), '/');
+        return rtrim(
+            str_replace('\\', '/', $basePath),
+            '/'
+        );
     }
 
     public static function input(): array
@@ -56,7 +96,6 @@ class Request
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
         if (str_contains($contentType, 'application/json')) {
-
             $data = json_decode(
                 file_get_contents('php://input'),
                 true

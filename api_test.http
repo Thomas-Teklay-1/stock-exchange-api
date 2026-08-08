@@ -1,0 +1,26 @@
+### Register
+POST http://localhost/stock-exchange-api/public/api/auth/register
+Content-Type: application/json
+
+{
+    "role": "buyer",
+    "name": "API Test User",
+    "email": "api-test@example.com",
+    "password": "TestPassword123!",
+    "phone": "0912345678"
+}
+
+
+### Login
+POST http://localhost/stock-exchange-api/public/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "api-test@example.com",
+    "password": "TestPassword123!"
+}
+
+
+### Logout
+POST http://localhost/stock-exchange-api/public/api/auth/logout
+Authorization: Bearer 2c9e3466b333f937f1f251d2046a8ac98c5c489be211ee9bcf141946e93c70e9
