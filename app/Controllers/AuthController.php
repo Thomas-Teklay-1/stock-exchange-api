@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Http\JsonResponse;
 use App\Http\Request;
+use App\Middleware\AuthenticationMiddleware;
 use App\Repositories\SessionRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthenticationService;
@@ -142,5 +143,19 @@ class AuthController
         }
 
         return trim($matches[1]);
+    }
+
+    public function me(): void
+    {
+        $middleware = new \App\Middleware\AuthenticationMiddleware();
+
+        $user = $middleware->authenticate();
+
+        JsonResponse::success(
+            data: [
+                'user' => $user->toArray(),
+            ],
+            message: 'Authenticated user.'
+        );
     }
 }

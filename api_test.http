@@ -23,4 +23,8 @@ Content-Type: application/json
 
 ### Logout
 POST http://localhost/stock-exchange-api/public/api/auth/logout
-Authorization: Bearer 2c9e3466b333f937f1f251d2046a8ac98c5c489be211ee9bcf141946e93c70e9
+Authorization: Bearer 60f346ec0488ab7f865b359e0d5650a56be39adf802399fde02e004cdff45e02
+
+### Get authenticated user
+GET http://localhost/stock-exchange-api/public/api/auth/me
+Authorization: Bearer 60f346ec0488ab7f865b359e0d5650a56be39adf802399fde02e004cdff45e02
