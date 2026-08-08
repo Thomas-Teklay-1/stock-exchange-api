@@ -6,7 +6,6 @@ namespace App\Controllers;
 
 use App\Http\JsonResponse;
 use App\Http\Request;
-use App\Middleware\AuthenticationMiddleware;
 use App\Repositories\SessionRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthenticationService;
@@ -147,9 +146,14 @@ class AuthController
 
     public function me(): void
     {
-        $middleware = new \App\Middleware\AuthenticationMiddleware();
+        $user = Request::user();
 
-        $user = $middleware->authenticate();
+        if ($user === null) {
+            JsonResponse::error(
+                message: 'Authenticated user could not be resolved.',
+                statusCode: 500
+            );
+        }
 
         JsonResponse::success(
             data: [

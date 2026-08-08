@@ -23,7 +23,7 @@ class AuthenticationMiddleware
         );
     }
 
-    public function authenticate(): User
+    public function handle(): void
     {
         $token = $this->getBearerToken();
 
@@ -44,7 +44,7 @@ class AuthenticationMiddleware
             );
         }
 
-        return $user;
+        Request::setAuthenticatedUser($user);
     }
 
     private function getBearerToken(): ?string

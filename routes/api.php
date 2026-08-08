@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AuthController;
+use App\Middleware\AuthenticationMiddleware;
 use App\Routing\Router;
 
 return static function (Router $router): void {
@@ -23,6 +24,7 @@ return static function (Router $router): void {
 
     $router->get(
         '/api/auth/me',
-        [AuthController::class, 'me']
+        [AuthController::class, 'me'],
+        [AuthenticationMiddleware::class]
     );
 };

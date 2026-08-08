@@ -4,8 +4,22 @@ declare(strict_types=1);
 
 namespace App\Http;
 
+use App\Models\User;
+
 class Request
 {
+    private static ?\App\Models\User $authenticatedUser = null;
+
+    public static function setAuthenticatedUser(User $user): void
+    {
+        self::$authenticatedUser = $user;
+    }
+
+    public static function user(): ?User
+    {
+        return self::$authenticatedUser;
+    }
+
     public static function method(): string
     {
         return $_SERVER['REQUEST_METHOD'] ?? 'GET';
